@@ -32,25 +32,15 @@ import * as vscode from 'vscode';
 // Show a message
 vscode.window.showInformationMessage('Hello from Playground!');
 
-// Register a new command
-const disposable = vscode.commands.registerCommand('playground.test', () => {
-    vscode.window.showInformationMessage('Command executed!');
-});
-
 // Work with the active editor
 const editor = vscode.window.activeTextEditor;
 if (editor) {
     console.log(`Editing: ${editor.document.fileName}`);
 }
 
-// Export functions for reuse
-export function customAction() {
-    // Your custom logic here
-}
-
 // Cleanup when playground reloads
 export function deactivate() {
-    disposable.dispose();
+    // disposable.dispose();
 }
 ```
 
