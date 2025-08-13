@@ -29,18 +29,67 @@ A VS Code extension that acts as a playground with access to the VS Code API, al
 ```javascript
 import * as vscode from 'vscode';
 
-// Show a message
-vscode.window.showInformationMessage('Hello from Playground!');
+let statusItem;
+let commands = [];
 
-// Work with the active editor
-const editor = vscode.window.activeTextEditor;
-if (editor) {
-    console.log(`Editing: ${editor.document.fileName}`);
+export function activate(context) {
+    // Create a clickable status bar item
+    statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+    statusItem.text = '$(beaker) Playground';
+    statusItem.tooltip = 'Click to show playground menu';
+    statusItem.command = 'playground.showMenu';
+    statusItem.show();
+    
+    // Register the menu command
+    const menuCommand = vscode.commands.registerCommand('playground.showMenu', async () => {
+        const items = [
+            { label: '$(megaphone) Say Hello', action: 'hello' },
+            { label: '$(file) Show Current File', action: 'currentFile' },
+            { label: '$(symbol-method) Get Selected Text', action: 'selectedText' },
+            { label: '$(gear) Show Settings', action: 'settings' }
+        ];
+        
+        const selected = await vscode.window.showQuickPick(items, {
+            placeHolder: 'Select a playground action'
+        });
+        
+        if (selected) {
+            switch(selected.action) {
+                case 'hello':
+                    vscode.window.showInformationMessage('Hello from Playground! 🎉');
+                    break;
+                case 'currentFile':
+                    const editor = vscode.window.activeTextEditor;
+                    if (editor) {
+                        vscode.window.showInformationMessage(`Current file: ${editor.document.fileName}`);
+                    }
+                    break;
+                case 'selectedText':
+                    const activeEditor = vscode.window.activeTextEditor;
+                    if (activeEditor) {
+                        const text = activeEditor.document.getText(activeEditor.selection);
+                        vscode.window.showInformationMessage(`Selected: "${text}"`);
+                    }
+                    break;
+                case 'settings':
+                    const config = vscode.workspace.getConfiguration();
+                    const theme = config.get('workbench.colorTheme');
+                    vscode.window.showInformationMessage(`Theme: ${theme}`);
+                    break;
+            }
+        }
+    });
+    
+    commands.push(menuCommand);
+    context.subscriptions.push(menuCommand);
+    context.subscriptions.push(statusItem);
 }
 
-// Cleanup when playground reloads
 export function deactivate() {
-    // disposable.dispose();
+    if (statusItem) {
+        statusItem.dispose();
+    }
+    commands.forEach(cmd => cmd.dispose());
 }
 ```
 

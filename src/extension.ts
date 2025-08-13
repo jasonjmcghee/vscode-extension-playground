@@ -5,11 +5,12 @@ import { PlaygroundExecutor } from './playground.js';
 
 let playgroundExecutor: PlaygroundExecutor | undefined;
 let fileWatcher: vscode.FileSystemWatcher | undefined;
+let outputChannel: vscode.OutputChannel | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('VS Code Runtime Playground is now active!');
     
-    const outputChannel = vscode.window.createOutputChannel('VS Code Playground');
+    outputChannel = vscode.window.createOutputChannel('VS Code Playground');
     playgroundExecutor = new PlaygroundExecutor(context, outputChannel);
     
     const createPlaygroundFile = vscode.commands.registerCommand('vscode-playground.createPlaygroundFile', () => {
@@ -138,11 +139,6 @@ vscode.window.showInformationMessage('Hello from VS Code Playground! 🎉');
 const statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 statusItem.text = '$(rocket) Playground Active';
 statusItem.show();
-
-// Example: Register a command
-const disposable = vscode.commands.registerCommand('playground.helloWorld', () => {
-    vscode.window.showInformationMessage('Hello World from Playground!');
-});
 
 // Example: Work with the active editor
 const editor = vscode.window.activeTextEditor;

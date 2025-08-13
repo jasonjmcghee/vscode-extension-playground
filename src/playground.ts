@@ -45,6 +45,37 @@ export class PlaygroundExecutor {
             
             this.currentPlayground = playground;
             
+            // Call activate if it's exported
+            if (playground.exports && playground.exports.activate) {
+                try {
+                    // Create a mock context that tracks disposables
+                    const mockContext = {
+                        subscriptions: {
+                            push: (...items: vscode.Disposable[]) => {
+                                items.forEach(item => {
+                                    if (item && typeof item.dispose === 'function') {
+                                        this.disposables.push(item);
+                                    }
+                                });
+                            }
+                        },
+                        extensionPath: this.context.extensionPath,
+                        globalState: this.context.globalState,
+                        workspaceState: this.context.workspaceState,
+                        extensionUri: this.context.extensionUri,
+                        storagePath: this.context.storagePath,
+                        globalStoragePath: this.context.globalStoragePath,
+                        logPath: this.context.logPath,
+                        extensionMode: this.context.extensionMode
+                    };
+                    
+                    playground.exports.activate(mockContext);
+                    this.outputChannel.appendLine('Called activate() function');
+                } catch (error: any) {
+                    this.outputChannel.appendLine(`Error calling activate: ${error.message}`);
+                }
+            }
+            
             // Handle exported functions
             if (playground.exports) {
                 this.outputChannel.appendLine('Exported functions available:');
@@ -87,8 +118,8 @@ export class PlaygroundExecutor {
         
         // Transform export statements
         transformed = transformed.replace(
-            /export\s+function\s+(\w+)/g,
-            'exports.$1 = function'
+            /export\s+(async\s+)?function\s+(\w+)/g,
+            'exports.$2 = $1function'
         );
         
         transformed = transformed.replace(
@@ -173,6 +204,24 @@ export class PlaygroundExecutor {
                                     }
                                 });
                             }
+                            if (prop === 'window') {
+                                return new Proxy(target.window, {
+                                    get(winTarget: any, winProp: string) {
+                                        const original = winTarget[winProp];
+                                        // Track all event listeners that start with 'on' and return disposables
+                                        if (typeof original === 'function' && winProp.startsWith('on')) {
+                                            return (...args: any[]) => {
+                                                const result = original.apply(winTarget, args);
+                                                if (result && typeof result.dispose === 'function') {
+                                                    return trackDisposable(result);
+                                                }
+                                                return result;
+                                            };
+                                        }
+                                        return original;
+                                    }
+                                });
+                            }
                             return target[prop];
                         }
                     });
@@ -224,7 +273,21 @@ export class PlaygroundExecutor {
     }
 
     stop(): void {
-        // Dispose all tracked disposables
+        // Call deactivate FIRST before disposing tracked disposables
+        // This allows deactivate to clean up its own resources
+        if (this.currentPlayground?.exports?.deactivate) {
+            try {
+                this.outputChannel.appendLine(`[${new Date().toLocaleTimeString()}] Calling deactivate()`);
+                this.currentPlayground.exports.deactivate();
+                this.outputChannel.appendLine(`[${new Date().toLocaleTimeString()}] deactivate() completed`);
+            } catch (error) {
+                this.outputChannel.appendLine(`[${new Date().toLocaleTimeString()}] Error calling deactivate: ${error}`);
+                console.error('Error calling deactivate:', error);
+            }
+        }
+        
+        // Then dispose all tracked disposables
+        this.outputChannel.appendLine(`[${new Date().toLocaleTimeString()}] Disposing ${this.disposables.length} tracked disposables`);
         this.disposables.forEach(d => {
             try {
                 d.dispose();
@@ -233,15 +296,6 @@ export class PlaygroundExecutor {
             }
         });
         this.disposables = [];
-        
-        // Call deactivate if it exists
-        if (this.currentPlayground?.exports?.deactivate) {
-            try {
-                this.currentPlayground.exports.deactivate();
-            } catch (error) {
-                console.error('Error calling deactivate:', error);
-            }
-        }
         
         this.currentPlayground = null;
     }
