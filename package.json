@@ -1,0 +1,55 @@
+{
+  "name": "vscode-extension-playground",
+  "displayName": "VS Code Extension Playground",
+  "description": "A developer playground for dynamically executing JavaScript with VS Code API access",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": ["Other"],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-playground.createPlaygroundFile",
+        "title": "Create VS Code Playground File"
+      },
+      {
+        "command": "vscode-playground.runPlayground",
+        "title": "Run VS Code Playground"
+      },
+      {
+        "command": "vscode-playground.stopPlayground",
+        "title": "Stop VS Code Playground"
+      }
+    ],
+    "configuration": {
+      "title": "VS Code Runtime Playground",
+      "properties": {
+        "vscode-playground.playgroundFileName": {
+          "type": "string",
+          "default": ".vscode-playground.js",
+          "description": "Name of the playground file to watch and execute"
+        },
+        "vscode-playground.autoRun": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically run playground when file changes"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^5.1.6"
+  }
+}
