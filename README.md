@@ -18,7 +18,9 @@ A VS Code extension that acts as a playground with access to the VS Code API, al
 
 ### Demo
 
-- Todo: Add a demo video!
+I add a new feature to recognize notes in parentheses as a chord.
+
+https://github.com/user-attachments/assets/7205a418-cf2c-41b0-8fe3-989cf4bf04b5
 
 ### Example `.vscode-playground.js`
 
