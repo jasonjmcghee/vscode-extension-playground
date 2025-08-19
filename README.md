@@ -24,7 +24,9 @@ A VS Code extension that acts as a playground with access to the VS Code API, al
 - `Run VS Code Playground` - Manually execute the playground file
 - `Stop VS Code Playground` - Stop the current playground and clean up resources
 
-### Example Playground Code
+### Example `.vscode-playground.js`
+
+(See [./examples](./examples) for more.
 
 ```javascript
 import * as vscode from 'vscode';
@@ -103,6 +105,12 @@ npm install
 
 And then I'd just use VS Code play button, which will use `launch.json` in turn.
 
+You may manually compile with:
+
+```bash
+npm run compile
+```
+
 ## Publishing
 
 To package the extension for distribution:
@@ -116,7 +124,3 @@ vsce package
 ```
 
 This creates a `.vsix` file that can be installed in VS Code.
-
-## License
-
-MIT# vscode-extension-playground
