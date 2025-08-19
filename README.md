@@ -93,6 +93,10 @@ export function deactivate() {
 }
 ```
 
+## Limitations
+
+Anything that requires package.json changes are not supported, however a workaround is that you can modify this extension itself, and reload vs code as you would when building any other extension.
+
 ## Developing the Extension
 
 You'll need to:
