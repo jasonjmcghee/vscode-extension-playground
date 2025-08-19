@@ -11,18 +11,14 @@ A VS Code extension that acts as a playground with access to the VS Code API, al
 
 ## Usage
 
-### Quick Start
-
 1. Open a workspace/folder in VS Code
 2. Run command: `Create VS Code Playground File` (Cmd/Ctrl+Shift+P)
 3. Edit the generated `.vscode-playground.js` file
 4. Updating the file will update (or error if invalid and log to console / output tab)
 
-### Commands
+### Demo
 
-- `Create VS Code Playground File` - Creates a new playground file with examples
-- `Run VS Code Playground` - Manually execute the playground file
-- `Stop VS Code Playground` - Stop the current playground and clean up resources
+- Todo: Add a demo video!
 
 ### Example `.vscode-playground.js`
 
@@ -124,3 +120,9 @@ vsce package
 ```
 
 This creates a `.vsix` file that can be installed in VS Code.
+
+### All Commands
+
+- `Create VS Code Playground File` - Creates a new playground file with examples
+- `Run VS Code Playground` - Manually execute the playground file
+- `Stop VS Code Playground` - Stop the current playground and clean up resources
